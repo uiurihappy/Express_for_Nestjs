@@ -5,33 +5,79 @@ import { Cat, CatType } from './app.model';
 const app: express.Express = express();
 const data = [1, 2, 3, 4];
 
-//middleware
+//* logging middleware
 app.use((req, res, next) => {
   console.log(req.rawHeaders[1]);
   console.log('this is logging middleware');
   next();
 });
 
-//middleware
-app.get('/cats/som', (req, res, next) => {
-  console.log(req.rawHeaders[1]);
-  console.log('this is som middleware');
-  next();
+//* json middleware
+app.use(express.json());
+
+//* Read 고양이 전체 데이터 조회
+app.get('/cats', (req, res) => {
+  try {
+    const cats = Cat;
+    throw new Error('db connect error');
+    res.status(200).send({
+      success: true,
+      data: {
+        cats,
+      },
+    });
+  } catch (error) {
+    res.status(400).send({
+      success: false,
+      error: error.message,
+    });
+  }
 });
 
-app.get('/', (req: express.Request, res: express.Response) => {
-  res.send({ cats: Cat });
+//* Read 특정 고양이 데이터 조회
+//* dynamic routing
+app.get('/cats/:id', (req, res) => {
+  try {
+    const params = req.params;
+    console.log(params);
+    const cat = Cat.find(cat => {
+      return cat.id === params.id;
+    });
+    // throw new Error('db connect error');
+    res.status(200).send({
+      success: true,
+      data: {
+        cat,
+      },
+    });
+  } catch (error) {
+    res.status(400).send({
+      success: false,
+      error: error.message,
+    });
+  }
 });
 
-app.get('/cats/blue', (req, res, next: express.NextFunction) => {
-  res.send({ blue: Cat[0] });
+//* Create 새로운 고양이 생성 API
+app.post('/cats', (req, res) => {
+  try {
+    const data = req.body;
+    console.log(data);
+    Cat.push(data); // create
+
+    res.status(200).send({
+      success: true,
+      data: { data },
+    });
+  } catch (error) {
+    res.status(400).send({
+      success: false,
+      error: error.message,
+    });
+  }
 });
 
-app.get('/cats/som', (req, res) => {
-  res.send({ som: Cat[1] });
-});
-
-//middleware 404 error
+//* 404 error middleware
 app.use((req, res, next) => {
   console.log('this is logging middleware');
   res.send({ error: '404 not found error' });
