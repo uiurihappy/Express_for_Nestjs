@@ -38,13 +38,13 @@ class Server {
 
   public listen() {
     this.setMiddleware();
-    this.app.listen(8000, () => {
+    this.app.listen(3000, () => {
       console.log('server is on...');
     });
   }
 }
 
-//초기화 
+//초기화
 function init() {
   //싱글톤 인스턴스
   const server = new Server();

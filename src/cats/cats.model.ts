@@ -8,7 +8,7 @@ export type CatType = {
   species: string;
 
   isCute: boolean;
-
+  
   friends: string[];
 };
 
